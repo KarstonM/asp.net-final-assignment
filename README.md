@@ -4,6 +4,8 @@ A web app for a car rental company to manage its fleet, customers and reservatio
 
 **Live demo:** https://vehiclerentalmanagementsys-d6cpbnb8b4d8h6e5.canadacentral-01.azurewebsites.net/ (register an account to log in)
 
+**Note: This app was deployed to Azure for the course. The hosted version is no longer running, but the full source, database migration and design documents are in this repo.**
+
 Final project for the ASP.NET course. This was a team project.
 
 ## Features
