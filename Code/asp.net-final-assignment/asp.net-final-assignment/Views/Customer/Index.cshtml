@@ -1,0 +1,428 @@
+﻿@model CustomerIndexVM
+@{
+    ViewData["Title"] = "Customers";
+}
+@functions {
+    public string FormatPhoneNumber(string raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw) || raw.Length < 10)
+            return "Invalid";
+
+        // Remove non-digit characters
+        var digits = new string(raw.Where(char.IsDigit).ToArray());
+
+        if (digits.Length != 10) return "Invalid";
+
+        return $"({digits.Substring(0, 3)}) {digits.Substring(3, 3)}-{digits.Substring(6)}";
+    }
+}
+
+<style>
+    html, body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #fff;
+    }
+
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 48px;
+        border-bottom: 1px solid #e0e0e0;
+        margin-bottom: 24px;
+    }
+
+    .navbar-left {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .nav-tabs {
+        display: flex;
+        gap: 16px;
+        margin-top: 12px;
+    }
+
+        .nav-tabs a {
+            padding: 14px 22px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            background-color: #f2f2f2;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+            text-decoration: none;
+            color: #000;
+        }
+
+            .nav-tabs a:hover {
+                background-color: #ddd;
+            }
+
+            .nav-tabs a.active {
+                background-color: #000;
+                color: white;
+            }
+
+    .account-wrapper {
+        display: flex;
+        align-items: center;
+        position: relative;
+        cursor: pointer;
+    }
+
+        .account-wrapper img {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .account-wrapper .arrow {
+            margin-left: 8px;
+            font-size: 18px;
+            color: #555;
+            transition: transform 0.2s ease;
+        }
+
+        .account-wrapper:hover .arrow {
+            transform: rotate(180deg);
+        }
+
+    .dropdown {
+        position: absolute;
+        top: 68px;
+        right: 0;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px 0;
+        width: 120px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+    }
+
+        .dropdown a {
+            display: block;
+            padding: 10px 16px;
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+        }
+
+            .dropdown a:hover {
+                background-color: #f5f5f5;
+            }
+
+    .hidden {
+        display: none;
+    }
+
+    .container {
+        padding: 0 48px;
+        font-size: 18px;
+    }
+
+    .search-section {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+        .search-section input[type="text"] {
+            padding: 8px 12px;
+            font-size: 18px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .search-section button {
+            padding: 8px 14px;
+            font-size: 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+    .search-btn {
+        background-color: #f0f0f0;
+    }
+
+        .search-btn:hover {
+            background-color: #ddd;
+        }
+
+    .add-btn {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+        .add-btn:hover {
+            background-color: #45a049;
+        }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 18px;
+    }
+
+        .table th, .table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+    .action-buttons {
+        display: flex;
+        gap: 10px;
+    }
+
+    .edit-btn, .delete-btn {
+        padding: 6px 12px;
+        font-size: 16px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    .edit-btn {
+        background-color: #2196F3;
+        color: white;
+    }
+
+        .edit-btn:hover {
+            background-color: #0b7dda;
+        }
+
+    .delete-btn {
+        background-color: #f44336;
+        color: white;
+        text-decoration: none;
+    }
+
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+
+    .card-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.4);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 999;
+    }
+
+    .card {
+        background-color: #fff;
+        padding: 32px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        width: 400px;
+        position: relative;
+    }
+
+        .card h3 {
+            margin-top: 0;
+            font-size: 18px;
+            margin-bottom: 16px;
+        }
+
+        .card input,
+        .card select {
+            width: 100%;
+            margin-bottom: 16px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 18px;
+            box-sizing: border-box;
+        }
+
+        .card button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            border-radius: 6px;
+            font-size: 18px;
+            cursor: pointer;
+        }
+
+            .card button:hover {
+                background-color: #45a049;
+            }
+
+    .close-icon {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        cursor: pointer;
+        font-size: 18px;
+        color: #888;
+    }
+
+        .close-icon:hover {
+            color: #000;
+        }
+</style>
+
+<div class="navbar">
+    <div class="navbar-left">
+        <h2>Vehicle Rental Management</h2>
+        <div class="nav-tabs">
+            <a href="/">Dashboard</a>
+            <a href="/vehicles">Vehicles</a>
+            <a href="/reservations">Reservations</a>
+            <a href="/customers" class="active">Customers</a>
+            <a href="/reports">Reports</a>
+        </div>
+    </div>
+    <div class="account-wrapper" onclick="toggleDropdown()">
+        <img src="https://www.svgrepo.com/show/384674/account-avatar-profile-user-11.svg" />
+        <span class="arrow">▼</span>
+        <div id="dropdown" class="dropdown hidden">
+            <a href="/logout">Log out</a>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <h3>Customers</h3>
+    <form method="get" asp-controller="Customer" asp-action="Index" class="search-section">
+        <input type="text" name="search" placeholder="Search customers..." value="@Context.Request.Query["search"]" />
+        <button type="submit" class="search-btn">Search</button>
+        <button type="button" class="add-btn" onclick="showCard()">Add Customer</button>
+    </form>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Status</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Payment Type</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var customer in Model.Customers)
+            {
+                <tr>
+                    <td>
+                        <img src="https://randomuser.me/api/portraits/men/@(customer.Id + 10).jpg" style="width:24px; height:24px; border-radius:50%; margin-right: 8px;" />
+                        @customer.Name
+                    </td>
+                    <td>@customer.Status</td>
+                    <td>@customer.Email</td>
+                    <td>@FormatPhoneNumber(customer.PhoneNumber)</td>
+                    <td>@customer.PaymentType</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="edit-btn"
+                                    onclick="editCustomer('@customer.Id', '@customer.Name', '@customer.Email', '@customer.PhoneNumber', '@customer.PaymentType', '@customer.Status')">
+                                Edit
+                            </button>
+                            <a class="delete-btn" href="/customers/delete/@customer.Id">Delete</a>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="card-overlay" id="cardOverlay" onclick="hideCard(event)">
+    <div class="card" onclick="event.stopPropagation()">
+        <span class="close-icon" onclick="hideCard(event)">×</span>
+        <h3 id="cardTitle">Add New Customer</h3>
+        <form method="post" asp-controller="Customer" asp-action="Add" id="customerForm">
+            <input type="hidden" id="customerId" name="Id" />
+            <input type="text" name="Name" placeholder="Full Name" required />
+            <input type="email" name="Email" placeholder="Email" required />
+            <input type="text" name="PhoneNumber" placeholder="Phone Number" required />
+            <span id="phoneError" style="margin-bottom: 16px; display: none;">Please enter a valid phone number (e.g., 403-123-4567)</span>
+
+            <select name="PaymentType" required>
+                <option value="">Select Payment Type</option>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Debit Card">Debit Card</option>
+                <option value="Cash">Cash</option>
+            </select>
+            <select name="Status" required>
+                <option value="">Select Status</option>
+                <option value="Renting">Renting</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function toggleDropdown() {
+        const dropdown = document.getElementById('dropdown');
+        dropdown.classList.toggle('hidden');
+    }
+
+    document.addEventListener('click', function (event) {
+        const wrapper = document.querySelector('.account-wrapper');
+        const dropdown = document.getElementById('dropdown');
+        if (!wrapper.contains(event.target)) {
+            dropdown.classList.add('hidden');
+        }
+    });
+
+    function showCard() {
+    document.getElementById('customerForm').reset();
+    document.getElementById('cardTitle').innerText = 'Add Customer';
+    document.getElementById('customerForm').action = '/customers/add';
+    document.getElementById('customerId').removeAttribute('name');
+    document.getElementById('customerId').value = '';
+    document.getElementById('cardOverlay').style.display = 'flex';
+    }
+
+    function hideCard(event) {
+        document.getElementById('cardOverlay').style.display = 'none';
+        document.getElementById('phoneError').style.display = 'none';
+    }
+
+    function editCustomer(id, name, email, phone, paymentType, status) {
+    document.getElementById('cardTitle').innerText = 'Edit Customer';
+    document.getElementById('customerForm').action = '/customers/edit/' + id;
+    document.getElementById('customerId').setAttribute('name', 'Id');
+    document.getElementById('customerId').value = id;
+    document.querySelector('input[name="Name"]').value = name;
+    document.querySelector('input[name="Email"]').value = email;
+    document.querySelector('input[name="PhoneNumber"]').value = phone;
+    document.querySelector('select[name="PaymentType"]').value = paymentType;
+    document.querySelector('select[name="Status"]').value = status;
+    document.getElementById('cardOverlay').style.display = 'flex';
+    }
+
+    document.getElementById('customerForm').addEventListener('submit', function (e) {
+        const phoneInput = document.querySelector('input[name="PhoneNumber"]');
+        const phoneError = document.getElementById('phoneError');
+        const phone = phoneInput.value.trim();
+        const pattern = /^\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}$/;
+
+        if (!pattern.test(phone)) {
+            phoneError.style.display = 'block';
+            e.preventDefault();
+        } else {
+            phoneError.style.display = 'none';
+        }
+    });
+</script>

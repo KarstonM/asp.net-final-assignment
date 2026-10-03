@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<parameters>
+  <parameter name="IIS Web Application Name" description="" value="VehicleRentalManagementSys" tags="IisApp">
+    <parameterEntry kind="ProviderPath" scope="IisApp" match="^C:\\School\\Asp\ \.Net\\Assignments\\Final\ Assignment\\Project\\asp\.net-final-assignment\\Code\\asp\.net-final-assignment\\asp\.net-final-assignment\\obj\\Release\\net8\.0\\PubTmp\\Out\\$" />
+  </parameter>
+</parameters>

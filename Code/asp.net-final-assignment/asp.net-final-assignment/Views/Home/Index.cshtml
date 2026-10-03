@@ -1,0 +1,369 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<style>
+    html, body {
+        height: 100%;
+        margin: 0;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #fff;
+    }
+
+    .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 24px 48px;
+        border-bottom: 1px solid #e0e0e0;
+        margin-bottom: 24px;
+    }
+
+    .navbar-left {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .nav-tabs {
+        display: flex;
+        gap: 16px;
+        margin-top: 12px;
+    }
+
+        .nav-tabs a {
+            text-decoration: none;
+            color: #000000;
+            padding: 14px 22px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            background-color: #f2f2f2;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+
+            .nav-tabs a:hover {
+                background-color: #ddd;
+            }
+
+            .nav-tabs a.active {
+                background-color: #000;
+                color: white;
+            }
+
+    .dashboard-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 36px;
+        padding: 0 48px 36px;
+        height: calc(100vh - 160px);
+        box-sizing: border-box;
+    }
+
+    .card-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 28px;
+        flex-shrink: 0;
+    }
+
+    .card {
+        background-color: #fff;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        padding: 32px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        font-size: 18px;
+    }
+
+        .card h3 {
+            margin: 0 0 12px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+    .value {
+        font-size: 40px;
+        font-weight: bold;
+    }
+
+    .green {
+        color: green;
+    }
+
+    .red {
+        color: red;
+    }
+
+    .subtext {
+        font-size: 16px;
+        color: #888;
+        margin-top: 10px;
+    }
+
+    .main-row {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 36px;
+        height: calc(100vh - 360px);
+        overflow: hidden;
+    }
+
+    .chart {
+        padding: 12px 16px 0;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        justify-content: start;
+        height: 100%;
+        box-sizing: border-box;
+    }
+
+        .chart h4 {
+            text-align: center;
+            font-weight: 600;
+            font-size: 40px;
+            margin-top: 12px;
+            margin-bottom: 12px;
+        }
+
+    .bar {
+        display: flex;
+        justify-content: space-around;
+        align-items: flex-end;
+        height: 100%;
+        flex-grow: 1;
+        margin-bottom: 10px;
+    }
+
+        .bar div {
+            height: 70%;
+            width: 100px;
+            background-color: #1d8ff2;
+            text-align: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 6px 6px 0 0;
+            padding-top: 4px;
+        }
+
+    .bar-labels {
+        display: flex;
+        justify-content: space-around;
+        font-size: 40px;
+        font-weight: 500;
+        margin-top: 4px;
+    }
+
+    .customers {
+        border: 1px solid #eee;
+        border-radius: 12px;
+        background-color: #fff;
+        padding: 20px;
+        height: 100%;
+        box-sizing: border-box;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .customers h4 {
+            font-size: 24px;
+            margin-top: 0px;
+            margin-bottom: 18px;
+        }
+
+    .customer {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 30px;
+    }
+
+        .customer img {
+            width: 112px;
+            height: 112px;
+            border-radius: 50%;
+        }
+
+    .customer-info strong {
+        font-size: 24px;
+        font-weight: 600;
+    }
+
+    .customer-info span {
+        font-size: 24px;
+        color: #666;
+    }
+
+    .dashboard-wrapper {
+        height: calc(100vh - 220px);
+        overflow: hidden;
+    }
+
+    .account-wrapper {
+        display: flex;
+        align-items: center;
+        position: relative;
+        cursor: pointer;
+    }
+
+        .account-wrapper img {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .account-wrapper .arrow {
+            margin-left: 8px;
+            font-size: 18px;
+            color: #555;
+            transition: transform 0.2s ease;
+        }
+
+        .account-wrapper:hover .arrow {
+            transform: rotate(180deg);
+        }
+
+    .dropdown {
+        position: absolute;
+        top: 68px;
+        right: 0;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 10px 0;
+        width: 120px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+    }
+
+        .dropdown a {
+            display: block;
+            padding: 10px 16px;
+            text-decoration: none;
+            color: #333;
+            font-size: 16px;
+        }
+
+            .dropdown a:hover {
+                background-color: #f5f5f5;
+            }
+
+    .hidden {
+        display: none;
+    }
+</style>
+
+
+<div class="navbar">
+    <div class="navbar-left">
+        <h2>Vehicle Rental Management</h2>
+        <div class="nav-tabs">
+            <a href="/" class="active">Dashboard</a>
+            <a href="/vehicles">Vehicles</a>
+            <a href="/reservations">Reservations</a>
+            <a href="/customers">Customers</a>
+            <a href="/reports">Reports</a>
+        </div>
+    </div>
+    <div class="account-wrapper" onclick="toggleDropdown()">
+        <img src="https://www.svgrepo.com/show/384674/account-avatar-profile-user-11.svg" />
+        <span class="arrow">▼</span>
+        <div id="dropdown" class="dropdown hidden">
+            <a href="/logout">Log out</a>
+        </div>
+    </div>
+</div>
+
+
+<div class="dashboard-wrapper">
+    <div class="card-container">
+        <!-- Total Vehicles -->
+        <div class="card">
+            <h3>Total Vehicles</h3>
+            <div class="value">Rented: <span class="green">@ViewBag.RentedVehicles</span></div>
+            <div class="subtext">
+                Available: <span class="red">@ViewBag.AvailableVehicles</span> |
+                Maintenance: <span class="red">@ViewBag.MaintenanceVehicles</span>
+            </div>
+        </div>
+
+        <!-- Registered Customers -->
+        <div class="card">
+            <h3>Registered Customers</h3>
+            <div class="value">@ViewBag.TotalCustomers</div>
+            <div class="subtext">New this month: <span class="green">@ViewBag.NewCustomers</span></div>
+        </div>
+
+        <!-- Upcoming Reservations -->
+        <div class="card">
+            <h3>Upcoming Reservations</h3>
+            <div class="value">@ViewBag.UpcomingReservations</div>
+            <div class="subtext">@ViewBag.ReservationDiffText total reservations vs last month</div>
+        </div>
+
+    </div>
+
+    <div class="main-row">
+        <div class="chart">
+            <h4>Top Rented Vehicles by Manufacturer</h4>
+            @{
+                var makes = (IEnumerable<dynamic>)ViewBag.TopRentedMakes;
+                var max = makes.Max(m => (int)m.Count);
+            }
+            <div class="bar">
+                @foreach (var make in makes)
+                {
+                    var heightPercent = (int)(((double)make.Count / max) * 100);
+                    <div style="height:@heightPercent%;">@make.Count</div>
+                }
+            </div>
+            <div class="bar-labels">
+                @foreach (var make in makes)
+                {
+                    <span>@make.Make</span>
+                }
+            </div>
+        </div>
+
+        <div class="customers">
+            <h4>Recurring Customers</h4>
+            @foreach (var customer in (List<Customer>)ViewBag.RecurringCustomers)
+            {
+                var latestReservation = customer.Reservations
+                .OrderByDescending(r => r.Start)
+                .FirstOrDefault();
+
+                <div class="customer">
+                    <img src="https://randomuser.me/api/portraits/men/@(customer.Id + 10).jpg" />
+                    <div class="customer-info">
+                        <strong>@customer.Name</strong>
+                        <span>Latest Reservation: @latestReservation?.Car?.Make @latestReservation?.Car?.Model | Rented: @latestReservation?.Start.ToString("MMM dd, yyyy")</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleDropdown() {
+        const dropdown = document.getElementById('dropdown');
+        dropdown.classList.toggle('hidden');
+    }
+
+    document.addEventListener('click', function (event) {
+        const accountWrapper = document.querySelector('.account-wrapper');
+        const dropdown = document.getElementById('dropdown');
+
+        if (!accountWrapper.contains(event.target)) {
+            dropdown.classList.add('hidden');
+        }
+    });
+</script>
